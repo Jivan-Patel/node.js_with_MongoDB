@@ -17,7 +17,6 @@ app.get('/', (req, res) => {
 
 
 const userSchema = new mongoose.Schema({
-    _id: Number,
     name: {
         type: String,
         required: true
