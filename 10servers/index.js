@@ -101,21 +101,35 @@ app.get("/brandProducts", async (req, res) => {
     }
 })
 
-
 app.get("/products", async (req, res) => {
     try {
-        const { brand, category } = req.query;
         let filter = {};
-        if(brand) {
-            filter.brand = brand;
-        }
-        if(category) {
-            filter.category = category;
+        for(const keys in req.query) {
+            filter[keys] = req.query[keys];
         }
         const products = await Product.find(filter)
         res.status(200).json(products);
     }
     catch (error) {
+        console.log(error)
+        res.status(404).json(error);
+    }
+})
+
+app.get("/sortedProducts", async (req, res) => {
+    try {
+        const sort = {};
+        if(req.query.price === "asc") {
+            sort.price = 1;
+        }
+        else {
+            sort.price = -1;
+        }
+        const products = await Product.find().sort(sort)
+        res.status(200).json(products);
+    }
+    catch (error) {
+        console.log(error)
         res.status(404).json(error);
     }
 })
