@@ -37,7 +37,8 @@ app.post("/products", async (req, res) => {
     const prod = {
         "title": req.body.title,
         "price": Number(req.body.price),
-        "category": req.body.category
+        "category": req.body.category,
+        "brand": req.body.brand
     }
     try {
         const NewProduct = new Product(prod);
@@ -130,6 +131,21 @@ app.get("/sortedProducts", async (req, res) => {
     }
     catch (error) {
         console.log(error)
+        res.status(404).json(error);
+    }
+})
+
+
+// Pagination 
+
+app.get('/products-pagination', async (req, res) => {    
+    try {
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (parseInt(req.query.page) || 1) * limit;
+        const products = await Product.find().skip(skip).limit(limit);
+        res.status(200).json(products);
+    }
+    catch (error) {
         res.status(404).json(error);
     }
 })
