@@ -105,7 +105,7 @@ app.get("/brandProducts", async (req, res) => {
 app.get("/products", async (req, res) => {
     try {
         let filter = {};
-        for(const keys in req.query) {
+        for (const keys in req.query) {
             filter[keys] = req.query[keys];
         }
         const products = await Product.find(filter)
@@ -120,7 +120,7 @@ app.get("/products", async (req, res) => {
 app.get("/sortedProducts", async (req, res) => {
     try {
         const sort = {};
-        if(req.query.price === "asc") {
+        if (req.query.price === "asc") {
             sort.price = 1;
         }
         else {
@@ -138,7 +138,7 @@ app.get("/sortedProducts", async (req, res) => {
 
 // Pagination 
 
-app.get('/products-pagination', async (req, res) => {    
+app.get('/products-pagination', async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 5;
         const skip = (parseInt(req.query.page) || 1) * limit;
@@ -150,6 +150,26 @@ app.get('/products-pagination', async (req, res) => {
     }
 })
 
+// Searching
+
+app.get('/products-search', async (req, res) => {
+    try {
+        const search = req.query.search;
+        const products = await Product.find({
+            $or: [
+                { "title": { $regex: search, $options: 'i' } },
+                { "brand": { $regex: search, $options: 'i' } },
+            ]
+        })
+        res.status(200).json(products);
+    }
+    catch (error) {
+        res.status(404).json(error);
+    }
+});
+
+
+
 app.listen(3000, () => {
-    console.log("server started at 3000")
+    console.log("server started at 3000");
 });
