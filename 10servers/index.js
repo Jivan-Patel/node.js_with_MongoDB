@@ -169,6 +169,40 @@ app.get('/products-search', async (req, res) => {
 });
 
 
+// merge all concepts in one route
+
+app.get("/allInOne", async (req, res) => {
+
+    try {
+        const { category, brand, title, search, limit, page } = req.query;
+        const filter = {};
+
+        // filtering
+
+        if (category) filter.category = category;
+        if (brand) filter.brand = brand;
+        if (title) filter.title = title;
+
+        // Searching
+
+        if (search) {
+            filter.$or = [
+                { "title": { $regex: search, $options: 'i' } },
+                { "brand": { $regex: search, $options: 'i' } },
+            ];
+        }
+
+        // pagination
+
+        const skip = ((page || 1) - 1) * (limit || 3);
+
+        const products = await Product.find(filter).skip(skip).limit(limit || 3);
+        res.status(200).json(products);
+    }
+    catch (error) {
+        res.status(404).json(error);
+    }
+});
 
 app.listen(3000, () => {
     console.log("server started at 3000");
